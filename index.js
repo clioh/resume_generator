@@ -41,7 +41,7 @@ const generatePDFHandler = async (req, res) => {
   }, resume);
 
   const pdf = await page.pdf({
-    margin: { left: "1 in", right: "1 in" }
+    margin: { left: "0.5 in", right: "0.5 in" }
   });
   await browser.close();
   res.setHeader("Content-Type", "application/pdf");
