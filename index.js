@@ -18,7 +18,7 @@ const generatePDFHandler = async (req, res) => {
   if (!resume) {
     return send(res, 400, "No resume in request body");
   }
-  const url = "http://localhost:3001";
+  const url = "https://create-resume.splat.studio";
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url);
