@@ -19,7 +19,9 @@ const generatePDFHandler = async (req, res) => {
     return send(res, 400, "No resume in request body");
   }
   const url = "https://create-resume.splat.studio";
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  });
   const page = await browser.newPage();
   await page.goto(url);
   page.emulateMedia("screen");
