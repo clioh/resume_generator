@@ -7,7 +7,7 @@
   "scripts": {
     "start": "micro -l tcp://0.0.0.0:$PORT",
     "dev": "micro-dev",
-    "inspect": "node --inspect node_modules/.bin/micro-dev"
+    "inspect": "node  --inspect node_modules/.bin/micro-dev"
   },
   "dependencies": {
     "micro": "^9.3.3",
