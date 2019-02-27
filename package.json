@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "micro src/index.js",
+    "start": "micro index.js",
     "now-build": "npm i puppeteer",
     "dev": "micro-dev",
     "inspect": "node --inspect node_modules/.bin/micro-dev"
