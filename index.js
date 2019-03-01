@@ -14,16 +14,17 @@ const optionsHandler = (req, res) => {
 };
 
 const generatePDFHandler = async (req, res) => {
-  const { resume } = await json(req);
-  if (!resume) {
-    return send(res, 400, "No resume in request body");
+  const { resume, margin, websiteUrl } = await json(req);
+  if (!resume || !websiteUrl || !margin) {
+    return send(res, 400, "Bad request");
   }
-  const url = "https://create-resume.splat.studio";
+  const { left: marginLeft, right: marginRight } = margin;
+
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
   const page = await browser.newPage();
-  await page.goto(url);
+  await page.goto(websiteUrl);
   page.emulateMedia("screen");
 
   await page.evaluate(async resume => {
@@ -41,7 +42,7 @@ const generatePDFHandler = async (req, res) => {
   }, resume);
 
   const pdf = await page.pdf({
-    margin: { left: "0.4 in", right: "0.4 in" }
+    margin: { left: marginLeft, right: marginRight }
   });
   await browser.close();
   res.setHeader("Content-Type", "application/pdf");
