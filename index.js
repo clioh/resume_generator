@@ -14,8 +14,8 @@ const optionsHandler = (req, res) => {
 };
 
 const generatePDFHandler = async (req, res) => {
-  const { resume, margin, websiteUrl } = await json(req);
-  if (!resume || !websiteUrl || !margin) {
+  const { resume, margin, websiteUrl, themeColor } = await json(req);
+  if (!resume || !websiteUrl || !margin || !themeColor) {
     return send(res, 400, "Bad request");
   }
   const { left: marginLeft, right: marginRight } = margin;
@@ -27,19 +27,23 @@ const generatePDFHandler = async (req, res) => {
   await page.goto(websiteUrl);
   page.emulateMedia("screen");
 
-  await page.evaluate(async resume => {
-    await window.loadJson(resume);
-    const selectors = Array.from(document.querySelectorAll("img"));
-    await Promise.all(
-      selectors.map(img => {
-        if (img.complete) return;
-        return new Promise((resolve, reject) => {
-          img.addEventListener("load", resolve);
-          img.addEventListener("error", reject);
-        });
-      })
-    );
-  }, resume);
+  await page.evaluate(
+    async ({ resume, themeColor }) => {
+      debugger;
+      await window.loadJson(resume, themeColor);
+      const selectors = Array.from(document.querySelectorAll("img"));
+      await Promise.all(
+        selectors.map(img => {
+          if (img.complete) return;
+          return new Promise((resolve, reject) => {
+            img.addEventListener("load", resolve);
+            img.addEventListener("error", reject);
+          });
+        })
+      );
+    },
+    { resume, themeColor }
+  );
 
   const pdf = await page.pdf({
     margin: { left: marginLeft, right: marginRight }
