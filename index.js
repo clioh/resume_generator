@@ -54,6 +54,7 @@ const generatePDFHandler = async (req, res) => {
 
 const routes = router(
   post("/", generatePDFHandler),
+  get("/", optionsHandler),
   options("/", cors(optionsHandler))
 );
 
