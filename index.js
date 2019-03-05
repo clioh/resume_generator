@@ -3,6 +3,7 @@ const micro = require("micro");
 const { send, json } = require("micro");
 const { router, get, options, post } = require("microrouter");
 const cors = require("micro-cors")();
+const stripe = require("stripe")("sk_test_0MlrnptIXnNfzxc33n0eepFl");
 
 const optionsHandler = (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -14,10 +15,33 @@ const optionsHandler = (req, res) => {
 };
 
 const generatePDFHandler = async (req, res) => {
-  const { resume, margin, websiteUrl, themeColor } = await json(req);
-  if (!resume || !websiteUrl || !margin || !themeColor) {
+  const {
+    resume,
+    margin,
+    websiteUrl,
+    themeColor,
+    stripeToken,
+    pdfOnly,
+    email
+  } = await json(req);
+  if (
+    !resume ||
+    !websiteUrl ||
+    !margin ||
+    !themeColor ||
+    !stripeToken ||
+    !pdfOnly
+  ) {
     return send(res, 400, "Bad request");
   }
+
+  const stripeConfirmation = await stripe.charges.create({
+    amount: pdfOnly ? 100 : 500,
+    currency: "usd",
+    source: process.env.ENVIRONMENT !== "PRODUCTION" ? "tok_visa" : stripeToken,
+    receipt_email: email ? email : null
+  });
+
   const { left: marginLeft, right: marginRight } = margin;
 
   const browser = await puppeteer.launch({
