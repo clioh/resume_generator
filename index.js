@@ -132,6 +132,17 @@ const getResumeHandler = async (req, res) => {
   return resume;
 };
 
+const checkUrlSlugHandler = async (req, res) => {
+  const { query } = await req;
+  const { slug } = query;
+
+  const slugAlreadyExists = await prisma.$exists.resume({ urlSlug: slug });
+  if (slug === "" || slug === "/") {
+    send(res, 200, { slugAvailable: false });
+  }
+
+  return send(res, 200, { slugAvailable: !slugAlreadyExists });
+};
 const routes = router(
   post("/", cors(generatePDFHandler)),
   get("/", optionsHandler),
