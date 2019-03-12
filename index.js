@@ -41,6 +41,9 @@ const generatePDFHandler = async (req, res) => {
     source: process.env.ENVIRONMENT !== "PRODUCTION" ? "tok_visa" : stripeToken,
     receipt_email: email ? email : null
   });
+  if (purchaseOption === "pdfAndWebsite" || purchaseOption === "code") {
+    await uploadResumeToDatabase(slug, resume, themeColor);
+  }
 
   const { left: marginLeft, right: marginRight } = margin;
 
@@ -143,6 +146,35 @@ const checkUrlSlugHandler = async (req, res) => {
 
   return send(res, 200, { slugAvailable: !slugAlreadyExists });
 };
+
+const uploadResumeToDatabase = async (slug, resume, themeColor) => {
+  const {
+    general,
+    workHistory,
+    education,
+    languages,
+    hobbies,
+    technicalSkills
+  } = resume;
+  let workHistoryPrepared = [];
+  workHistory.forEach(job => {
+    const { tasks, ...rest } = job;
+    workHistoryPrepared.push({ ...rest, tasks: { set: tasks } });
+  });
+  const res = await prisma.createResume({
+    urlSlug: slug,
+    themeColor,
+    general: {
+      create: { ...general }
+    },
+    workHistory: { create: workHistoryPrepared },
+    languages: { create: [...languages] },
+    hobbies: { create: [...hobbies] },
+    technicalSkills: { create: [...technicalSkills] },
+    education: { create: [...education] }
+  });
+};
+
 const routes = router(
   post("/", cors(generatePDFHandler)),
   get("/", optionsHandler),
