@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const micro = require("micro");
-const { send, json } = require("micro");
+const { prisma } = require("./generated/prisma-client");
+const { send, json, createError } = require("micro");
 const { router, get, options, post } = require("microrouter");
 const cors = require("micro-cors")();
 const stripe = require("stripe")("sk_test_0MlrnptIXnNfzxc33n0eepFl");
@@ -21,8 +22,9 @@ const generatePDFHandler = async (req, res) => {
     websiteUrl,
     themeColor,
     stripeToken,
-    pdfOnly,
-    email
+    email,
+    purchaseOption,
+    slug
   } = await json(req);
   if (
     !resume ||
@@ -30,7 +32,7 @@ const generatePDFHandler = async (req, res) => {
     !margin ||
     !themeColor ||
     !stripeToken ||
-    !pdfOnly
+    !purchaseOption
   ) {
     return send(res, 400, "Bad request");
   }
@@ -45,6 +47,7 @@ const generatePDFHandler = async (req, res) => {
     source: process.env.ENVIRONMENT !== "PRODUCTION" ? "tok_visa" : stripeToken,
     receipt_email: email ? email : null
   });
+
   if (purchaseOption === "pdfAndWebsite" || purchaseOption === "code") {
     await uploadResumeToDatabase(slug, resume, themeColor);
   }
