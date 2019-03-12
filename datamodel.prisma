@@ -1,0 +1,52 @@
+type Resume {
+  id: ID! @unique
+  urlSlug: String! @unique
+  themeColor: String!
+  general: General!
+  education: [Education!]!
+  workHistory: [Job!]!
+  languages: [Language!]!
+  hobbies: [Hobby!]!
+  technicalSkills: [Skill!]!
+}
+
+type General {
+  github: String!
+  firstName: String!
+  lastName: String!
+  address: String!
+  phoneNumber: String!
+  email: String!
+}
+
+type Language {
+  language: String!
+  level: String!
+}
+
+type Hobby {
+  name: String!
+  icon: String!
+  link: String
+}
+
+type Skill {
+  name: String!
+  level: Float!
+}
+
+type Job {
+  position: String!
+  company: String!
+  location: String!
+  startDate: String!
+  endDate: String!
+  tasks: [String!]!
+}
+
+type Education {
+  fieldOfStudy: String!
+  dateEnded: String!
+  name: String!
+  location: String!
+}
