@@ -146,6 +146,8 @@ const checkUrlSlugHandler = async (req, res) => {
 const routes = router(
   post("/", cors(generatePDFHandler)),
   get("/", optionsHandler),
+  get("/resume", cors(getResumeHandler)),
+  get("/exists", cors(checkUrlSlugHandler)),
   options("/", cors(optionsHandler))
 );
 
