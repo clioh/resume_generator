@@ -34,9 +34,13 @@ const generatePDFHandler = async (req, res) => {
   ) {
     return send(res, 400, "Bad request");
   }
+  const PURCHASE_PRICES = { pdfOnly: 100, pdfAndWebsite: 500, code: 1000 };
+  if (Object.keys(PURCHASE_PRICES).indexOf(purchaseOption) < 0) {
+    return send(res, 400, "Bad request");
+  }
 
   const stripeConfirmation = await stripe.charges.create({
-    amount: pdfOnly ? 100 : 500,
+    amount: PURCHASE_PRICES[purchaseOption],
     currency: "usd",
     source: process.env.ENVIRONMENT !== "PRODUCTION" ? "tok_visa" : stripeToken,
     receipt_email: email ? email : null
