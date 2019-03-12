@@ -80,6 +80,58 @@ const generatePDFHandler = async (req, res) => {
   return send(res, 200, pdf);
 };
 
+const getResumeHandler = async (req, res) => {
+  const { query } = await req;
+  const { slug } = query;
+  if (!slug) {
+    return createError(400, "No slug found");
+  }
+  const resume = await prisma.resume({ urlSlug: slug })
+    .$fragment(`fragment CompleteResume on Resume {
+      themeColor
+      urlSlug
+      general {
+        address
+        email
+        firstName
+        lastName
+        github
+        phoneNumber
+      }
+      education {
+        dateEnded
+        fieldOfStudy
+        location
+        name
+      }
+      hobbies {
+        icon
+        link
+        name
+      }
+      workHistory {
+        company
+        endDate
+        startDate
+        location
+        position
+        tasks
+      }
+      languages {
+        language
+        level
+      }
+      technicalSkills {
+        level
+        name
+      }
+}`);
+  if (!resume) {
+    return createError(404, "Resume not found");
+  }
+  return resume;
+};
+
 const routes = router(
   post("/", cors(generatePDFHandler)),
   get("/", optionsHandler),
